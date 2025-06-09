@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:watch/core/di/provider.dart';
 import 'package:watch/features/clock/presentation/widgets/flip_digit.dart';
+import 'package:watch/features/clock/domain/entities/clock_settings.dart';
+import 'package:watch/features/settings/presentation/widgets/settings_controls.dart';
 
 class ClockPage extends ConsumerWidget {
   const ClockPage({super.key});
@@ -11,6 +13,7 @@ class ClockPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final asyncTime = ref.watch(timeStreamProvider);
     final timeStream = ref.watch(timeStreamProvider.stream);
+    final settings = ref.watch(settingsProvider);
 
     return Scaffold(
       body: Center(
@@ -29,18 +32,31 @@ class ClockPage extends ConsumerWidget {
             const SizedBox(height: 20),
             // Flip Clock
             asyncTime.when(
-              data: (time) => _buildClockDisplay(context, time, timeStream),
-              loading: () => _buildClockDisplay(context, DateTime.now(), const Stream.empty()),
+              data: (time) => _buildClockDisplay(context, time, timeStream, settings.timeFormat),
+              loading: () => _buildClockDisplay(
+                  context, DateTime.now(), const Stream.empty(), settings.timeFormat),
               error: (err, stack) => const Text('Error displaying clock'),
             ),
+            const SizedBox(height: 40),
+            // Settings Controls
+            const SettingsControls(),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildClockDisplay(BuildContext context, DateTime time, Stream<DateTime> stream) {
-    final hour = time.hour;
+  Widget _buildClockDisplay(
+      BuildContext context, DateTime time, Stream<DateTime> stream, TimeFormat timeFormat) {
+    int hour = time.hour;
+    String amPm = '';
+
+    if (timeFormat == TimeFormat.h12) {
+      amPm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      if (hour == 0) hour = 12; // 12 AM and 12 PM
+    }
+
     final minute = time.minute;
     final second = time.second;
 
@@ -59,10 +75,21 @@ class ClockPage extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
+        if (timeFormat == TimeFormat.h12) ...[
+          Text(amPm, style: Theme.of(context).textTheme.headlineMedium),
+          const SizedBox(width: 16),
+        ],
         // Hour
         FlipDigit(
           initialValue: hour ~/ 10,
-          stream: stream.map((t) => t.hour ~/ 10).distinct(),
+          stream: stream.map((t) {
+            int h = t.hour;
+            if (timeFormat == TimeFormat.h12) {
+              h = h % 12;
+              if (h == 0) h = 12;
+            }
+            return h ~/ 10;
+          }).distinct(),
           textStyle: textStyle,
           width: digitWidth,
           height: digitHeight,
@@ -71,7 +98,14 @@ class ClockPage extends ConsumerWidget {
         const SizedBox(width: 8),
         FlipDigit(
           initialValue: hour % 10,
-          stream: stream.map((t) => t.hour % 10).distinct(),
+          stream: stream.map((t) {
+            int h = t.hour;
+            if (timeFormat == TimeFormat.h12) {
+              h = h % 12;
+              if (h == 0) h = 12;
+            }
+            return h % 10;
+          }).distinct(),
           textStyle: textStyle,
           width: digitWidth,
           height: digitHeight,

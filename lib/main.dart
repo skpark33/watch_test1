@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/date_symbol_data_local.dart';
+import 'package:watch/core/di/provider.dart';
 import 'package:watch/core/theme/app_theme.dart';
 import 'package:watch/features/clock/presentation/pages/clock_page.dart';
 
@@ -15,17 +16,34 @@ void main() async {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Digital Clock',
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system, // Or connect to a provider
-      home: const ClockPage(),
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sharedPreferencesAsync = ref.watch(sharedPreferencesProvider);
+
+    return sharedPreferencesAsync.when(
+      data: (_) {
+        final settings = ref.watch(settingsProvider);
+        return MaterialApp(
+          title: 'Digital Clock',
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: settings.themeMode,
+          home: const ClockPage(),
+        );
+      },
+      loading: () => const MaterialApp(
+        home: Scaffold(
+          body: Center(child: CircularProgressIndicator()),
+        ),
+      ),
+      error: (err, stack) => MaterialApp(
+        home: Scaffold(
+          body: Center(child: Text('Error: $err')),
+        ),
+      ),
     );
   }
 }
