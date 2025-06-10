@@ -38,10 +38,12 @@ final getTimeStreamProvider = Provider<GetTimeStream>((ref) {
 // --- Presentation ---
 
 // Time Stream Provider for the UI
+/*
 final timeStreamProvider = StreamProvider<DateTime>((ref) {
   final getTimeStream = ref.watch(getTimeStreamProvider);
   return getTimeStream();
 });
+*/
 
 // --- Settings Feature ---
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:watch/core/di/provider.dart';
+import 'package:watch/features/clock/presentation/notifiers/time_notifier.dart';
 import 'package:watch/features/clock/presentation/widgets/flip_digit.dart';
 import 'package:watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:watch/features/settings/presentation/widgets/settings_controls.dart';
@@ -11,8 +12,8 @@ class ClockPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final asyncTime = ref.watch(timeStreamProvider);
-    final timeStream = ref.watch(timeStreamProvider.stream);
+    final asyncTime = ref.watch(timeNotifierProvider);
+    final timeStream = ref.read(timeNotifierProvider.notifier).stream;
     final settings = ref.watch(settingsProvider);
 
     return Scaffold(

@@ -6,6 +6,6 @@ class GetTimeStream {
   GetTimeStream(this.repository);
 
   Stream<DateTime> call() {
-    return repository.getTimeStream();
+    return repository.getTimeStream().asBroadcastStream();
   }
 }
