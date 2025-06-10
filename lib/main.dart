@@ -37,7 +37,19 @@ class MyApp extends ConsumerWidget {
           theme: AppTheme.lightTheme,
           darkTheme: AppTheme.darkTheme,
           themeMode: settings.themeMode,
-          home: const ClockPage(),
+          home: Center(
+            child: Container(
+              width: 1920,
+              height: 400,
+              decoration: BoxDecoration(
+                //color: Colors.red,
+                border: Border.all(color: Colors.blue, width: 10),
+              ),
+              child: const ClockPage(
+                alarmTimes: ['2025/06/10 18:01', '2025/06/10 18:02'],
+              ),
+            ),
+          ),
         );
       },
       loading: () => const MaterialApp(
