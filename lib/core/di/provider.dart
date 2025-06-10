@@ -17,6 +17,13 @@ import 'package:watch/features/world_clock/domain/repositories/world_clock_repos
 import 'package:watch/features/world_clock/domain/usecases/add_world_city.dart';
 import 'package:watch/features/world_clock/domain/usecases/delete_world_city.dart';
 import 'package:watch/features/world_clock/domain/usecases/get_world_cities.dart';
+import 'package:watch/features/clock/data/datasources/font_local_data_source.dart';
+import 'package:watch/features/clock/data/repositories/font_repository_impl.dart';
+import 'package:watch/features/clock/domain/repositories/font_repository.dart';
+import 'package:watch/features/clock/domain/usecases/get_font.dart';
+import 'package:watch/features/clock/domain/usecases/save_font.dart';
+import 'package:watch/features/clock/presentation/notifiers/font_notifier.dart';
+import 'package:flutter/material.dart';
 
 // --- Core ---
 final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) {
@@ -29,16 +36,36 @@ final timeDataSourceProvider = Provider<TimeDataSource>((ref) {
   return TimeDataSourceImpl();
 });
 
+final fontLocalDataSourceProvider = Provider<FontLocalDataSource>((ref) {
+  final sharedPreferences = ref.watch(sharedPreferencesProvider).asData!.value;
+  return FontLocalDataSourceImpl(sharedPreferences);
+});
+
 // Repositories
 final timeRepositoryProvider = Provider<TimeRepository>((ref) {
   final dataSource = ref.watch(timeDataSourceProvider);
   return TimeRepositoryImpl(dataSource);
 });
 
+final fontRepositoryProvider = Provider<FontRepository>((ref) {
+  final dataSource = ref.watch(fontLocalDataSourceProvider);
+  return FontRepositoryImpl(dataSource);
+});
+
 // Use Cases
 final getTimeStreamProvider = Provider<GetTimeStream>((ref) {
   final repository = ref.watch(timeRepositoryProvider);
   return GetTimeStream(repository);
+});
+
+final getFontProvider = Provider<GetFont>((ref) {
+  final repository = ref.watch(fontRepositoryProvider);
+  return GetFont(repository);
+});
+
+final saveFontProvider = Provider<SaveFont>((ref) {
+  final repository = ref.watch(fontRepositoryProvider);
+  return SaveFont(repository);
 });
 
 // --- Presentation ---
@@ -117,3 +144,9 @@ final deleteWorldCityProvider = Provider<DeleteWorldCity>((ref) {
 enum ClockView { main, world }
 
 final clockViewProvider = StateProvider<ClockView>((ref) => ClockView.main);
+
+final fontProvider = StateNotifierProvider<FontNotifier, TextStyle>((ref) {
+  final getFont = ref.watch(getFontProvider);
+  final saveFont = ref.watch(saveFontProvider);
+  return FontNotifier(getFont, saveFont);
+});

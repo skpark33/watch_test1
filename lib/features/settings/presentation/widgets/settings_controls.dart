@@ -29,6 +29,17 @@ class SettingsControls extends ConsumerWidget {
             tooltip: 'Toggle Theme',
           ),
           const SizedBox(width: 20),
+
+          // Font Toggle
+          IconButton(
+            icon: const Icon(Icons.font_download),
+            onPressed: () {
+              ref.read(fontProvider.notifier).toggleFont();
+            },
+            tooltip: 'Toggle Font',
+          ),
+          const SizedBox(width: 20),
+
           // Time Format Toggle
           InkWell(
             onTap: () {

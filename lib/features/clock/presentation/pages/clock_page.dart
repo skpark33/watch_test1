@@ -54,6 +54,7 @@ class MainClockView extends ConsumerWidget {
     final asyncTime = ref.watch(timeNotifierProvider);
     final timeStream = ref.read(timeNotifierProvider.notifier).stream;
     final settings = ref.watch(settingsProvider);
+    final fontStyle = ref.watch(fontProvider);
 
     return Center(
       child: Column(
@@ -71,9 +72,10 @@ class MainClockView extends ConsumerWidget {
           const SizedBox(height: 20),
           // Flip Clock
           asyncTime.when(
-            data: (time) => _buildClockDisplay(context, time, timeStream, settings.timeFormat),
+            data: (time) =>
+                _buildClockDisplay(context, time, timeStream, settings.timeFormat, fontStyle),
             loading: () => _buildClockDisplay(
-                context, DateTime.now(), const Stream.empty(), settings.timeFormat),
+                context, DateTime.now(), const Stream.empty(), settings.timeFormat, fontStyle),
             error: (err, stack) => const Text('Error displaying clock'),
           ),
           const SizedBox(height: 40),
@@ -84,8 +86,8 @@ class MainClockView extends ConsumerWidget {
     );
   }
 
-  Widget _buildClockDisplay(
-      BuildContext context, DateTime time, Stream<DateTime> stream, TimeFormat timeFormat) {
+  Widget _buildClockDisplay(BuildContext context, DateTime time, Stream<DateTime> stream,
+      TimeFormat timeFormat, TextStyle fontStyle) {
     int hour = time.hour;
     String amPm = '';
 
@@ -101,10 +103,7 @@ class MainClockView extends ConsumerWidget {
     final brightness = Theme.of(context).brightness;
     final textColor = brightness == Brightness.dark ? Colors.white : Colors.black87;
 
-    final textStyle = Theme.of(context).textTheme.displayLarge?.copyWith(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-        );
+    final textStyle = fontStyle.copyWith(color: textColor);
 
     final digitWidth = 100.0;
     final digitHeight = 150.0;
@@ -149,7 +148,7 @@ class MainClockView extends ConsumerWidget {
           height: digitHeight,
           backgroundColor: digitBackgroundColor,
         ),
-        _buildSeparator(context),
+        _buildSeparator(context, fontStyle),
         // Minute
         FlipDigit(
           initialValue: minute ~/ 10,
@@ -168,7 +167,7 @@ class MainClockView extends ConsumerWidget {
           height: digitHeight,
           backgroundColor: digitBackgroundColor,
         ),
-        _buildSeparator(context),
+        _buildSeparator(context, fontStyle),
         // Second
         FlipDigit(
           initialValue: second ~/ 10,
@@ -191,17 +190,19 @@ class MainClockView extends ConsumerWidget {
     );
   }
 
-  Widget _buildSeparator(BuildContext context) {
+  Widget _buildSeparator(BuildContext context, TextStyle fontStyle) {
     final brightness = Theme.of(context).brightness;
     final separatorColor = brightness == Brightness.dark ? Colors.white54 : Colors.black54;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Text(
         ':',
-        style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: separatorColor,
-            ),
+        style: TextStyle(
+          fontFamily: fontStyle.fontFamily,
+          fontSize: Theme.of(context).textTheme.displayLarge?.fontSize,
+          fontWeight: FontWeight.bold,
+          color: separatorColor,
+        ),
       ),
     );
   }
