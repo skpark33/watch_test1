@@ -4,10 +4,16 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:watch/core/di/provider.dart';
 import 'package:watch/core/theme/app_theme.dart';
 import 'package:watch/features/clock/presentation/pages/clock_page.dart';
+import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('ko_KR', null);
+
+  // Initialize timezone data
+  tz_data.initializeTimeZones();
+  tz.setLocalLocation(tz.getLocation('Asia/Seoul'));
 
   runApp(
     const ProviderScope(

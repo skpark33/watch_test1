@@ -49,19 +49,19 @@
 
 ---
 
-### ☐ **Phase 4: 세계 시각 기능 구현**
-- [ ] **Domain**:
-    - [ ] `WorldCity` 엔티티 및 `WorldClockRepository` 인터페이스 정의
-    - [ ] `GetWorldCities`, `AddWorldCity`, `DeleteWorldCity` 유스케이스 작성
-- [ ] **Data**:
-    - [ ] `shared_preferences`를 사용한 `WorldClockRepository` 구현
-    - [ ] 타임존 계산을 위한 로직 구현 (또는 라이브러리 활용)
-- [ ] **Presentation**:
-    - [ ] 기본 시계 ↔ 세계 시각 화면 전환 기능 구현
-    - [ ] `WorldClockPage` UI 구성 (와이어프레임 기반)
-    - [ ] 도시 추가/관리 UI 및 기능 구현
-- [ ] **Test**:
-    - [ ] 세계 시각 관련 유스케이스 유닛 테스트 작성
+### ☑ **Phase 4: 세계 시각 기능 구현**
+- [x] **Domain**:
+    - [x] `WorldCity` 엔티티 및 `WorldClockRepository` 인터페이스 정의
+    - [x] `GetWorldCities`, `AddWorldCity`, `DeleteWorldCity` 유스케이스 작성
+- [x] **Data**:
+    - [x] `shared_preferences`를 사용한 `WorldClockRepository` 구현
+    - [x] 타임존 계산을 위한 로직 구현 (또는 라이브러리 활용)
+- [x] **Presentation**:
+    - [x] 기본 시계 ↔ 세계 시각 화면 전환 기능 구현
+    - [x] `WorldClockPage` UI 구성 (와이어프레임 기반)
+    - [x] 도시 추가/관리 UI 및 기능 구현
+- [x] **Test**:
+    - [x] 세계 시각 관련 유스케이스 유닛 테스트 작성
 - **COMMIT**: `feat(worldclock): Implement world clock view and city management`
 
 ---

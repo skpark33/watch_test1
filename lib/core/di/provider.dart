@@ -11,6 +11,12 @@ import 'package:watch/features/settings/domain/usecases/get_settings.dart';
 import 'package:watch/features/settings/domain/usecases/save_settings.dart';
 import 'package:watch/features/settings/presentation/notifiers/settings_notifier.dart';
 import 'package:watch/features/clock/domain/entities/clock_settings.dart';
+import 'package:watch/features/world_clock/data/datasources/world_clock_local_data_source.dart';
+import 'package:watch/features/world_clock/data/repositories/world_clock_repository_impl.dart';
+import 'package:watch/features/world_clock/domain/repositories/world_clock_repository.dart';
+import 'package:watch/features/world_clock/domain/usecases/add_world_city.dart';
+import 'package:watch/features/world_clock/domain/usecases/delete_world_city.dart';
+import 'package:watch/features/world_clock/domain/usecases/get_world_cities.dart';
 
 // --- Core ---
 final sharedPreferencesProvider = FutureProvider<SharedPreferences>((ref) {
@@ -76,3 +82,38 @@ final settingsProvider = StateNotifierProvider<SettingsNotifier, ClockSettings>(
   final saveSettings = ref.watch(saveSettingsProvider);
   return SettingsNotifier(getSettings, saveSettings);
 });
+
+// --- World Clock Feature ---
+
+// Data Sources
+final worldClockLocalDataSourceProvider = Provider<WorldClockLocalDataSource>((ref) {
+  final sharedPreferences = ref.watch(sharedPreferencesProvider).asData!.value;
+  return WorldClockLocalDataSourceImpl(sharedPreferences);
+});
+
+// Repositories
+final worldClockRepositoryProvider = Provider<WorldClockRepository>((ref) {
+  final dataSource = ref.watch(worldClockLocalDataSourceProvider);
+  return WorldClockRepositoryImpl(dataSource);
+});
+
+// Use Cases
+final getWorldCitiesProvider = Provider<GetWorldCities>((ref) {
+  final repository = ref.watch(worldClockRepositoryProvider);
+  return GetWorldCities(repository);
+});
+
+final addWorldCityProvider = Provider<AddWorldCity>((ref) {
+  final repository = ref.watch(worldClockRepositoryProvider);
+  return AddWorldCity(repository);
+});
+
+final deleteWorldCityProvider = Provider<DeleteWorldCity>((ref) {
+  final repository = ref.watch(worldClockRepositoryProvider);
+  return DeleteWorldCity(repository);
+});
+
+// --- Presentation Layer Providers ---
+enum ClockView { main, world }
+
+final clockViewProvider = StateProvider<ClockView>((ref) => ClockView.main);

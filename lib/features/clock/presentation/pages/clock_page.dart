@@ -6,9 +6,48 @@ import 'package:watch/features/clock/presentation/notifiers/time_notifier.dart';
 import 'package:watch/features/clock/presentation/widgets/flip_digit.dart';
 import 'package:watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:watch/features/settings/presentation/widgets/settings_controls.dart';
+import 'package:watch/features/world_clock/presentation/pages/world_clock_page.dart';
+import 'package:watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
 
 class ClockPage extends ConsumerWidget {
   const ClockPage({super.key});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final clockView = ref.watch(clockViewProvider);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(clockView == ClockView.main ? 'Digital Clock' : 'World Clock'),
+        actions: [
+          if (clockView == ClockView.world)
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AddCityDialog(),
+                );
+              },
+            ),
+          IconButton(
+            icon: Icon(
+              clockView == ClockView.main ? Icons.public : Icons.watch_later,
+            ),
+            onPressed: () {
+              final notifier = ref.read(clockViewProvider.notifier);
+              notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
+            },
+          ),
+        ],
+      ),
+      body: clockView == ClockView.main ? const MainClockView() : const WorldClockPage(),
+    );
+  }
+}
+
+class MainClockView extends ConsumerWidget {
+  const MainClockView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -16,33 +55,31 @@ class ClockPage extends ConsumerWidget {
     final timeStream = ref.read(timeNotifierProvider.notifier).stream;
     final settings = ref.watch(settingsProvider);
 
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Date and Day display
-            asyncTime.when(
-              data: (time) => Text(
-                DateFormat('yyyy년 M월 d일 (E)', 'ko_KR').format(time),
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-              loading: () => const SizedBox(height: 30),
-              error: (err, stack) => const Text('Error'),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          // Date and Day display
+          asyncTime.when(
+            data: (time) => Text(
+              DateFormat('yyyy년 M월 d일 (E)', 'ko_KR').format(time),
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
-            const SizedBox(height: 20),
-            // Flip Clock
-            asyncTime.when(
-              data: (time) => _buildClockDisplay(context, time, timeStream, settings.timeFormat),
-              loading: () => _buildClockDisplay(
-                  context, DateTime.now(), const Stream.empty(), settings.timeFormat),
-              error: (err, stack) => const Text('Error displaying clock'),
-            ),
-            const SizedBox(height: 40),
-            // Settings Controls
-            const SettingsControls(),
-          ],
-        ),
+            loading: () => const SizedBox(height: 30),
+            error: (err, stack) => const Text('Error'),
+          ),
+          const SizedBox(height: 20),
+          // Flip Clock
+          asyncTime.when(
+            data: (time) => _buildClockDisplay(context, time, timeStream, settings.timeFormat),
+            loading: () => _buildClockDisplay(
+                context, DateTime.now(), const Stream.empty(), settings.timeFormat),
+            error: (err, stack) => const Text('Error displaying clock'),
+          ),
+          const SizedBox(height: 40),
+          // Settings Controls
+          const SettingsControls(),
+        ],
       ),
     );
   }
