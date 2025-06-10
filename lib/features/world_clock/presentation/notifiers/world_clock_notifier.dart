@@ -41,7 +41,7 @@ class WorldClockNotifier extends StateNotifier<AsyncValue<List<WorldCity>>> {
       );
       await _addWorldCity(newCity);
       loadCities(); // Refresh the list
-    } catch (e, s) {
+    } catch (e, _) {
       // Optionally handle error state specifically for add
     }
   }
@@ -50,7 +50,7 @@ class WorldClockNotifier extends StateNotifier<AsyncValue<List<WorldCity>>> {
     try {
       await _deleteWorldCity(cityId);
       loadCities(); // Refresh the list
-    } catch (e, s) {
+    } catch (e, _) {
       // Optionally handle error state specifically for delete
     }
   }

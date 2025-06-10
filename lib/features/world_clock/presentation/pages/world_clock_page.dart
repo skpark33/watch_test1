@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:timezone/timezone.dart' as tz;
-import 'package:watch/core/di/provider.dart';
+//import 'package:watch/core/di/provider.dart';
 import 'package:watch/features/clock/presentation/notifiers/time_notifier.dart';
 import 'package:watch/features/world_clock/presentation/notifiers/world_clock_notifier.dart';
 
