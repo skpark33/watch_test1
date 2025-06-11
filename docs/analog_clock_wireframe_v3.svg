@@ -1,0 +1,47 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Center Pivot -->
+  <circle cx="100" cy="100" r="3" fill="black"/>
+
+  <!-- Hands (Example: 10:10:30) -->
+  <!-- Hour Hand -->
+  <line x1="100" y1="100" x2="100" y2="55" stroke="black" stroke-width="5" stroke-linecap="round" transform="rotate(305, 100, 100)" />
+  <!-- Minute Hand -->
+  <line x1="100" y1="100" x2="100" y2="25" stroke="black" stroke-width="3" stroke-linecap="round" transform="rotate(60, 100, 100)" />
+  <!-- Second Hand -->
+  <line x1="100" y1="100" x2="100" y2="20" stroke="red" stroke-width="1.5" stroke-linecap="round" transform="rotate(180, 100, 100)" />
+
+  <!-- Tick Marks as dots -->
+  <g id="ticks" fill="black">
+    <!-- Major ticks (12, 3, 6, 9) -->
+    <circle cx="100" cy="12" r="3.5"/>
+    <circle cx="188" cy="100" r="3.5"/>
+    <circle cx="100" cy="188" r="3.5"/>
+    <circle cx="12" cy="100" r="3.5"/>
+
+    <!-- Minor ticks -->
+    <g transform="rotate(30, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+    <g transform="rotate(60, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+    <g transform="rotate(120, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+    <g transform="rotate(150, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+     <g transform="rotate(210, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+    <g transform="rotate(240, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+    <g transform="rotate(300, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+    <g transform="rotate(330, 100, 100)">
+      <circle cx="100" cy="12" r="1.5"/>
+    </g>
+  </g>
+</svg> 
