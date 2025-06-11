@@ -8,8 +8,8 @@ import 'package:watch/features/clock/presentation/notifiers/time_notifier.dart';
 import 'package:watch/features/clock/presentation/widgets/flip_digit.dart';
 import 'package:watch/features/clock/domain/entities/clock_settings.dart';
 import 'package:watch/features/settings/presentation/widgets/settings_controls.dart';
-import 'package:watch/features/world_clock/presentation/pages/world_clock_page.dart';
-import 'package:watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
+//import 'package:watch/features/world_clock/presentation/pages/world_clock_page.dart';
+//import 'package:watch/features/world_clock/presentation/widgets/add_city_dialog.dart';
 import 'package:flutter/foundation.dart' show kIsWeb, listEquals;
 
 class ClockPage extends ConsumerStatefulWidget {
@@ -159,33 +159,33 @@ class _ClockPageState extends ConsumerState<ClockPage> {
 
   @override
   Widget build(BuildContext context) {
-    final clockView = ref.watch(clockViewProvider);
+    //final clockView = ref.watch(clockViewProvider);
 
     final pageContent = Scaffold(
-      backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
-      body: clockView == ClockView.main
-          ? MainClockView(
-              isAlarmRinging: _isAlarmRinging,
-              onDismissAlarm: _dismissAlarm,
-              alarmTimes: _managedAlarmTimes,
-              onAddAlarm: _addAlarm,
-              onDeleteAlarm: _deleteAlarm,
-              onTimeZoneChanged: () {
-                if (_isAlarmRinging) return; // Prevent navigation while alarm is ringing
-                print('onTimeZoneChanged');
-                // final notifier = ref.read(clockViewProvider.notifier);
-                // notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
-              },
-            )
-          : WorldClockPage(
-              onAddCity: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const AddCityDialog(),
-                );
-              },
-            ),
-    );
+        backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
+        body: //clockView == ClockView.main          ?
+            MainClockView(
+          isAlarmRinging: _isAlarmRinging,
+          onDismissAlarm: _dismissAlarm,
+          alarmTimes: _managedAlarmTimes,
+          onAddAlarm: _addAlarm,
+          onDeleteAlarm: _deleteAlarm,
+          onTimeZoneChanged: () {
+            if (_isAlarmRinging) return; // Prevent navigation while alarm is ringing
+            print('onTimeZoneChanged');
+            // final notifier = ref.read(clockViewProvider.notifier);
+            // notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
+          },
+        )
+        // : WorldClockPage(
+        //     onAddCity: () {
+        //       showDialog(
+        //         context: context,
+        //         builder: (context) => const AddCityDialog(),
+        //       );
+        //     },
+        //   ),
+        );
 
     if (!_isWebAudioReady) {
       return Stack(
@@ -280,14 +280,8 @@ class MainClockView extends ConsumerWidget {
                 context, DateTime.now(), const Stream.empty(), settings.timeFormat, fontStyle),
             error: (err, stack) => const Text('Error displaying clock'),
           ),
-          const SizedBox(height: 40),
+          const SizedBox(height: 20),
           // Settings, Alarm, and Dismiss controls
-          // if (isAlarmRinging)
-          //   ElevatedButton(
-          //     onPressed: onDismissAlarm,
-          //     child: const Text('알람 해제'),
-          //   )
-          // else
           SettingsControls(
             isAlarmRinging: isAlarmRinging,
             alarmTimes: alarmTimes,
@@ -320,8 +314,8 @@ class MainClockView extends ConsumerWidget {
 
     final textStyle = fontStyle.copyWith(color: textColor);
 
-    final digitWidth = 100.0;
-    final digitHeight = 150.0;
+    final digitWidth = 120.0;
+    final digitHeight = 180.0;
     final digitBackgroundColor = Theme.of(context).colorScheme.surface;
 
     return Row(

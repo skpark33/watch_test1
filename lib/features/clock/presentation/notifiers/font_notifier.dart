@@ -11,7 +11,7 @@ class FontNotifier extends StateNotifier<TextStyle> {
   FontNotifier(this._getFont, this._saveFont)
       : super(
           GoogleFonts.michroma(
-            textStyle: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+            textStyle: const TextStyle(fontSize: 96, fontWeight: FontWeight.bold),
           ),
         ) {
     _loadFont();
@@ -19,16 +19,16 @@ class FontNotifier extends StateNotifier<TextStyle> {
 
   final List<TextStyle> _fonts = [
     GoogleFonts.michroma(
-      textStyle: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+      textStyle: const TextStyle(fontSize: 96, fontWeight: FontWeight.bold),
     ),
     GoogleFonts.orbitron(
-      textStyle: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+      textStyle: const TextStyle(fontSize: 96, fontWeight: FontWeight.bold),
     ),
     GoogleFonts.poiretOne(
-      textStyle: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+      textStyle: const TextStyle(fontSize: 96, fontWeight: FontWeight.bold),
     ),
     GoogleFonts.rubikGlitch(
-      textStyle: const TextStyle(fontSize: 80, fontWeight: FontWeight.bold),
+      textStyle: const TextStyle(fontSize: 96, fontWeight: FontWeight.bold),
     ),
   ];
 
