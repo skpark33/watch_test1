@@ -32,11 +32,22 @@ class _ClockPageState extends ConsumerState<ClockPage> {
   final AudioPlayer _audioPlayer = AudioPlayer();
   StreamSubscription? _timeSubscription;
   bool _isWebAudioReady = !kIsWeb;
+  bool _showWebAudioMessage = kIsWeb;
+  Timer? _overlayTimer;
 
   @override
   void initState() {
     super.initState();
     _managedAlarmTimes = List<String>.from(widget.alarmTimes ?? []);
+    if (_showWebAudioMessage) {
+      _overlayTimer = Timer(const Duration(seconds: 7), () {
+        if (mounted) {
+          setState(() {
+            _showWebAudioMessage = false;
+          });
+        }
+      });
+    }
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _parseAlarmTime();
       _setupAlarmListener();
@@ -139,6 +150,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
 
   @override
   void dispose() {
+    _overlayTimer?.cancel();
     _alarmTimeout?.cancel();
     _timeSubscription?.cancel();
     _audioPlayer.dispose();
@@ -150,32 +162,7 @@ class _ClockPageState extends ConsumerState<ClockPage> {
     final clockView = ref.watch(clockViewProvider);
 
     final pageContent = Scaffold(
-      backgroundColor: _isAlarmRinging ? Colors.red.withOpacity(0.7) : null,
-      appBar: AppBar(
-        title: Text(clockView == ClockView.main ? 'Digital Clock' : 'World Clock'),
-        actions: [
-          if (clockView == ClockView.world)
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (context) => const AddCityDialog(),
-                );
-              },
-            ),
-          IconButton(
-            icon: Icon(
-              clockView == ClockView.main ? Icons.public : Icons.watch_later,
-            ),
-            onPressed: () {
-              if (_isAlarmRinging) return; // Prevent navigation while alarm is ringing
-              final notifier = ref.read(clockViewProvider.notifier);
-              notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
-            },
-          ),
-        ],
-      ),
+      backgroundColor: _isAlarmRinging ? Colors.red.withValues(alpha: 0.7) : null,
       body: clockView == ClockView.main
           ? MainClockView(
               isAlarmRinging: _isAlarmRinging,
@@ -183,8 +170,21 @@ class _ClockPageState extends ConsumerState<ClockPage> {
               alarmTimes: _managedAlarmTimes,
               onAddAlarm: _addAlarm,
               onDeleteAlarm: _deleteAlarm,
+              onTimeZoneChanged: () {
+                if (_isAlarmRinging) return; // Prevent navigation while alarm is ringing
+                print('onTimeZoneChanged');
+                // final notifier = ref.read(clockViewProvider.notifier);
+                // notifier.state = clockView == ClockView.main ? ClockView.world : ClockView.main;
+              },
             )
-          : const WorldClockPage(),
+          : WorldClockPage(
+              onAddCity: () {
+                showDialog(
+                  context: context,
+                  builder: (context) => const AddCityDialog(),
+                );
+              },
+            ),
     );
 
     if (!_isWebAudioReady) {
@@ -192,26 +192,40 @@ class _ClockPageState extends ConsumerState<ClockPage> {
         children: [
           pageContent,
           Positioned.fill(
-            child: GestureDetector(
-              onTap: () async {
-                await _audioPlayer.resume();
-                if (mounted) {
-                  setState(() {
-                    _isWebAudioReady = true;
-                  });
-                }
-              },
-              child: Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: Text(
-                    '웹에서는 소리를 재생하려면 화면을 한 번 클릭해야 합니다.\nClick to enable sound.',
-                    style: TextStyle(color: Colors.white, fontSize: 20),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ),
-            ),
+            child: LayoutBuilder(builder: (context, constraints) {
+              final bodyHeight = constraints.maxHeight - MediaQuery.of(context).padding.top;
+              return GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () async {
+                  await _audioPlayer.resume();
+                  if (mounted) {
+                    setState(() {
+                      _isWebAudioReady = true;
+                    });
+                    _overlayTimer?.cancel();
+                  }
+                },
+                child: _showWebAudioMessage
+                    ? Align(
+                        alignment: Alignment.bottomCenter,
+                        child: SizedBox(
+                          height: bodyHeight * 0.2,
+                          width: double.infinity,
+                          child: Container(
+                            color: Colors.black.withValues(alpha: 0.5),
+                            child: const Center(
+                              child: Text(
+                                '웹에서는 소리를 재생하려면 화면을 한 번 클릭해야 합니다.\nClick to enable sound.',
+                                style: TextStyle(color: Colors.white, fontSize: 20),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
+                          ),
+                        ),
+                      )
+                    : Container(),
+              );
+            }),
           ),
         ],
       );
@@ -226,6 +240,7 @@ class MainClockView extends ConsumerWidget {
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
+  final VoidCallback onTimeZoneChanged;
 
   const MainClockView({
     super.key,
@@ -234,6 +249,7 @@ class MainClockView extends ConsumerWidget {
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
+    required this.onTimeZoneChanged,
   });
 
   @override
@@ -247,7 +263,6 @@ class MainClockView extends ConsumerWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // Date and Day display
           asyncTime.when(
             data: (time) => Text(
               DateFormat('yyyy년 M월 d일 (E)', 'ko_KR').format(time),
@@ -266,13 +281,20 @@ class MainClockView extends ConsumerWidget {
             error: (err, stack) => const Text('Error displaying clock'),
           ),
           const SizedBox(height: 40),
-          // Settings Controls
+          // Settings, Alarm, and Dismiss controls
+          // if (isAlarmRinging)
+          //   ElevatedButton(
+          //     onPressed: onDismissAlarm,
+          //     child: const Text('알람 해제'),
+          //   )
+          // else
           SettingsControls(
             isAlarmRinging: isAlarmRinging,
-            onDismissAlarm: onDismissAlarm,
             alarmTimes: alarmTimes,
             onAddAlarm: onAddAlarm,
             onDeleteAlarm: onDeleteAlarm,
+            onTimeZoneChanged: onTimeZoneChanged,
+            onDismissAlarm: onDismissAlarm,
           ),
         ],
       ),

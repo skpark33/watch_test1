@@ -29,6 +29,7 @@ class _AlarmSettingsDialogState extends State<AlarmSettingsDialog> {
     if (date == null) return;
 
     final time = await showTimePicker(
+      // ignore: use_build_context_synchronously
       context: context,
       initialTime: TimeOfDay.fromDateTime(now),
     );

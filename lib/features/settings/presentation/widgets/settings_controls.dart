@@ -10,6 +10,7 @@ class SettingsControls extends ConsumerWidget {
   final List<String>? alarmTimes;
   final Function(DateTime) onAddAlarm;
   final Function(int) onDeleteAlarm;
+  final VoidCallback onTimeZoneChanged;
 
   const SettingsControls({
     super.key,
@@ -18,6 +19,7 @@ class SettingsControls extends ConsumerWidget {
     this.alarmTimes,
     required this.onAddAlarm,
     required this.onDeleteAlarm,
+    required this.onTimeZoneChanged,
   });
 
   @override
@@ -92,6 +94,11 @@ class SettingsControls extends ConsumerWidget {
                 );
               },
               tooltip: alarmTimes != null && alarmTimes!.isNotEmpty ? '알람이 설정되었습니다.' : '설정된 알람 없음',
+            ),
+            const SizedBox(width: 20),
+            IconButton(
+              icon: const Icon(Icons.public),
+              onPressed: onTimeZoneChanged,
             ),
           ]
         ],
